@@ -16,11 +16,8 @@ public class Utils {
     private static final String[] DEBIT_INDICATORS = {"debited", "send", "sent", "paid", "deducted"};
     private static final String[] CREDIT_INDICATORS = {"credited", "received", "receive", "added"};
 
-    //    As per TRAI rules, all banking transaction messages should follow this regular expression's format
-    private static final String SENDER_REGEX = "[a-zA-Z]{2}-[a-zA-Z]{6}";
-
     private static final String ACCOUNT_REGEX = "(?:account|a/c|acct)";
-    private static final String CREDIT_DEBIT_REGEX = "(?:credit|debit)";
+    private static final String CREDIT_DEBIT_REGEX = "(?:credit|debit|received|sent)";
     private static final String AMOUNT_REGEX_1 = "(?:inr|rs)+[\\\\.]?[\\\\s]*[0-9+[\\\\,]?[0-9]+]+[\\\\.]*[0-9]+";
     private static final String AMOUNT_REGEX_2 = "[0-9+[\\\\,]*+[0-9]*]*[\\\\.]*[0-9]+[\\\\s]*(?:inr|rs)+";
 
@@ -28,6 +25,11 @@ public class Utils {
         return containsRegex(body, ACCOUNT_REGEX) && containsRegex(body, CREDIT_DEBIT_REGEX) &&
                 (containsRegex(body, AMOUNT_REGEX_1) || containsRegex(body, AMOUNT_REGEX_2)) &&
                 !containSuspiciousWords(body);
+    }
+
+    public static boolean equalsRegex(String body, String regex) {
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(body).matches();
     }
 
     public static boolean containsRegex(String body, String regex) {

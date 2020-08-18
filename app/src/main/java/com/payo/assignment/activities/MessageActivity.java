@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -43,6 +44,11 @@ public class MessageActivity extends AppCompatActivity {
     PieChart pieChart;
     @BindView(R.id.rg_filter)
     RadioGroup filter;
+    @BindView(R.id.tv_total_credit)
+    TextView totalCredit;
+    @BindView(R.id.tv_total_debit)
+    TextView totalDebit;
+
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("CheckResult")
@@ -97,10 +103,12 @@ public class MessageActivity extends AppCompatActivity {
 
         messagesViewModel.getAmountCredited(this).observe(this, credited -> {
             earnedMoney = credited;
+            totalCredit.setText(String.format("Total Credit - Rs %s", credited));
             updateChart();
         });
         messagesViewModel.getAmountDebited(this).observe(this, debited -> {
             spentMoney = debited;
+            totalDebit.setText(String.format("Total Debit - Rs %s", debited));
             updateChart();
         });
         messagesViewModel.getAmountUndefined(this).observe(this, undefined -> {
