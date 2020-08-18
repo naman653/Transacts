@@ -12,8 +12,6 @@ import java.util.List;
 
 @Dao
 public interface MessageDao {
-    @Query("DELETE FROM message")
-    void deleteAll();
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(Message msg);
