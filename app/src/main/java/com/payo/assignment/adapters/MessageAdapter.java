@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.payo.assignment.R;
 import com.payo.assignment.data.Message;
+import com.payo.assignment.data.TransactionType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         holder.bank.setText(message.getSenderId());
         holder.message.setText(message.getBody());
         @ColorInt int color = 0;
-        switch (message.getType()) {
+        switch (TransactionType.valueOf(message.getType())) {
             case DEBIT:
                 color = holder.amount.getContext().getResources().getColor(R.color.debit_color);
                 break;

@@ -1,10 +1,27 @@
 package com.payo.assignment.data;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "Message")
 public class Message {
+    @PrimaryKey
+    @NonNull
+    private String msgId;
     private String senderId;
     private String body;
     private double amount;
-    private TransactionType type;
+    private String type;
+
+    @NonNull
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(@NonNull String msgId) {
+        this.msgId = msgId;
+    }
 
     public String getSenderId() {
         return senderId;
@@ -22,11 +39,11 @@ public class Message {
         this.amount = amount;
     }
 
-    public TransactionType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(TransactionType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -36,11 +53,5 @@ public class Message {
 
     public void setBody(String body) {
         this.body = body;
-    }
-
-    public enum TransactionType {
-        DEBIT,
-        CREDIT,
-        UNDEFINED
     }
 }

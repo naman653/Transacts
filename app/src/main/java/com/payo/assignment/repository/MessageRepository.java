@@ -3,10 +3,15 @@ package com.payo.assignment.repository;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.payo.assignment.dao.MessageDao;
 import com.payo.assignment.data.Message;
+import com.payo.assignment.data.TransactionType;
+import com.payo.assignment.database.MessageDatabase;
 import com.payo.assignment.utils.Utils;
 
 import java.util.ArrayList;
@@ -20,39 +25,52 @@ public class MessageRepository {
 
     private volatile static MessageRepository INSTANCE = null;
 
+    private boolean cursorFetched;
+
     private MutableLiveData<Double> amountCredited;
     private MutableLiveData<Double>  amountDebited;
     private MutableLiveData<Double>  amountUndefined;
+    private MessageDatabase messageDatabase;
+    private MessageDao msgDao;
 
-    private MessageRepository() {
+    private MessageRepository(Context context) {
         amountCredited = new MutableLiveData<>();
         amountCredited.setValue(0.0);
         amountDebited = new MutableLiveData<>();
         amountDebited.setValue(0.0);
         amountUndefined = new MutableLiveData<>();
         amountUndefined.setValue(0.0);
+        cursorFetched = false;
+        messageDatabase = MessageDatabase.getDatabase(context);
+        msgDao = messageDatabase.messageDao();
     }
 
-    public static MessageRepository getInstance() {
+    public static MessageRepository getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (MessageRepository.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new MessageRepository();
+                    INSTANCE = new MessageRepository(context);
                 }
             }
         }
         return INSTANCE;
     }
 
-    public MutableLiveData<List<Message>> fetchMessages(Context context) {
+    public LiveData<List<Message>> fetchMessages(Context context) {
         MutableLiveData<List<Message>> messages = new MutableLiveData<>();
 
-        getMessages(context)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(msgList -> messages.setValue(msgList));
+        if (!cursorFetched) {
+            getMessages(context)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(msgList -> messages.setValue(msgList));
+        }
 
-        return messages;
+        return msgDao.getAllMessages();
+    }
+
+    public LiveData<List<Message>> fetchTypeMessages(String type) {
+        return msgDao.getMessages(type);
     }
 
     private Observable<List<Message>> getMessages(Context context) {
@@ -65,15 +83,17 @@ public class MessageRepository {
 
                     String msgAddress = cursor.getString(cursor.getColumnIndexOrThrow("address"));
                     String msgData = cursor.getString(cursor.getColumnIndexOrThrow("body"));
+                    String msgId = cursor.getString(cursor.getColumnIndexOrThrow("_id"));
 
                     if (Utils.isValidMessage(msgData, msgAddress)) {
                         Message message = new Message();
+                        message.setMsgId(msgId);
                         message.setSenderId(msgAddress);
                         message.setAmount(Utils.getAmount(msgData));
                         message.setType(Utils.getMessageType(msgData));
                         message.setBody(msgData);
                         messageList.add(message);
-                        switch (message.getType()) {
+                        switch (TransactionType.valueOf(message.getType())) {
                             case UNDEFINED:
                                 amountUndefined.setValue(amountUndefined.getValue() + message.getAmount());
                                 break;
@@ -84,6 +104,7 @@ public class MessageRepository {
                                 amountCredited.setValue(amountCredited.getValue() + message.getAmount());
                                 break;
                         }
+                        new InsertAsyncTask(msgDao).execute(message);
                     }
                 } while (cursor.moveToNext());
             }
@@ -91,6 +112,7 @@ public class MessageRepository {
         }
         return Observable.just(messageList);
     }
+
     public MutableLiveData<Double> getAmountCredited() {
         return amountCredited;
     }
@@ -101,5 +123,20 @@ public class MessageRepository {
 
     public MutableLiveData<Double> getAmountUndefined() {
         return amountUndefined;
+    }
+
+    private static class InsertAsyncTask extends AsyncTask<Message, Void, Void> {
+
+        private MessageDao mAsyncTaskDao;
+
+        InsertAsyncTask(MessageDao dao) {
+            mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Message... params) {
+            mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
     }
 }

@@ -2,7 +2,7 @@ package com.payo.assignment.utils;
 
 import android.util.Log;
 
-import com.payo.assignment.data.Message;
+import com.payo.assignment.data.TransactionType;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -95,13 +95,13 @@ public class Utils {
         return amt;
     }
 
-    public static Message.TransactionType getMessageType(String body) {
+    public static String getMessageType(String body) {
         if (isCredit(body) && !isDebit(body)) {
-            return Message.TransactionType.CREDIT;
+            return TransactionType.CREDIT.name();
         } else if (isDebit(body) && !isCredit(body)) {
-            return Message.TransactionType.DEBIT;
+            return TransactionType.DEBIT.name();
         } else {
-            return Message.TransactionType.UNDEFINED;
+            return TransactionType.UNDEFINED.name();
         }
     }
 }

@@ -74,15 +74,15 @@ public class MessageActivity extends AppCompatActivity {
                     }
                 }, throwable -> Log.e(TAG, throwable.toString()));
 
-        messagesViewModel.getAmountCredited().observe(this, credited -> {
+        messagesViewModel.getAmountCredited(this).observe(this, credited -> {
             earnedMoney = credited;
             updateChart();
         });
-        messagesViewModel.getAmountDebited().observe(this, debited -> {
+        messagesViewModel.getAmountDebited(this).observe(this, debited -> {
             spentMoney = debited;
             updateChart();
         });
-        messagesViewModel.getAmountUndefined().observe(this, undefined -> {
+        messagesViewModel.getAmountUndefined(this).observe(this, undefined -> {
             unknownMoney = undefined;
             updateChart();
         });
