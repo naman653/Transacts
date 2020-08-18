@@ -3,4 +3,8 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <color name="debit_color">@android:color/holo_red_light</color>
+    <color name="credit_color">#12BC1A</color>
+    <color name="undefined_color">#20B0FF</color>
 </resources>
