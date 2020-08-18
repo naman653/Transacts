@@ -28,8 +28,8 @@ public class MessageRepository {
     private boolean cursorFetched;
 
     private MutableLiveData<Double> amountCredited;
-    private MutableLiveData<Double>  amountDebited;
-    private MutableLiveData<Double>  amountUndefined;
+    private MutableLiveData<Double> amountDebited;
+    private MutableLiveData<Double> amountUndefined;
     private MessageDao msgDao;
 
     private MessageRepository(Context context) {
