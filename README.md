@@ -14,6 +14,7 @@ Create an android application that analyses all the SMS of the user, then findss
 6. At last, Tested the algorithm from transaction messages of SBI, Paytm Banks, and BOB credit cards.
 
 #### About the app:
+Application Name : Transacts
 Number of Screens : 1
 Min Supported SDK : 21
 Tested On Android 10, API Level 28
