@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -17,6 +18,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.payo.assignment.R;
 import com.payo.assignment.adapters.MessageAdapter;
+import com.payo.assignment.data.TransactionType;
 import com.payo.assignment.viewmodels.MessagesViewModel;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
@@ -39,6 +41,8 @@ public class MessageActivity extends AppCompatActivity {
     RecyclerView messagesList;
     @BindView(R.id.pie_chart)
     PieChart pieChart;
+    @BindView(R.id.rg_filter)
+    RadioGroup filter;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressLint("CheckResult")
@@ -64,6 +68,23 @@ public class MessageActivity extends AppCompatActivity {
         pieChart.setHighlightPerTapEnabled(true);
         pieChart.setDrawEntryLabels(false);
         pieChart.animateY(1400, Easing.EaseInOutQuad);
+
+        filter.setOnCheckedChangeListener((radioGroup, i) -> {
+            switch (radioGroup.getCheckedRadioButtonId()) {
+                case R.id.rb_all:
+                    messagesViewModel.getMessages(getApplicationContext()).observe(this,
+                            messageAdapter::setDataset);
+                    break;
+                case R.id.rb_credit:
+                    messagesViewModel.filterMessages(getApplicationContext(), TransactionType.CREDIT.name())
+                            .observe(this, messageAdapter::setDataset);
+                    break;
+                case R.id.rb_debit:
+                    messagesViewModel.filterMessages(getApplicationContext(), TransactionType.DEBIT.name())
+                            .observe(this, messageAdapter::setDataset);
+                    break;
+            }
+        });
 
         RxPermissions rxPermissions = new RxPermissions(this);
         rxPermissions.request(Manifest.permission.READ_SMS)

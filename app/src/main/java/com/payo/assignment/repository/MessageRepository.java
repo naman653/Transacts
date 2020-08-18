@@ -30,7 +30,6 @@ public class MessageRepository {
     private MutableLiveData<Double> amountCredited;
     private MutableLiveData<Double>  amountDebited;
     private MutableLiveData<Double>  amountUndefined;
-    private MessageDatabase messageDatabase;
     private MessageDao msgDao;
 
     private MessageRepository(Context context) {
@@ -41,8 +40,7 @@ public class MessageRepository {
         amountUndefined = new MutableLiveData<>();
         amountUndefined.setValue(0.0);
         cursorFetched = false;
-        messageDatabase = MessageDatabase.getDatabase(context);
-        msgDao = messageDatabase.messageDao();
+        msgDao = MessageDatabase.getDatabase(context).messageDao();
     }
 
     public static MessageRepository getInstance(Context context) {
@@ -57,13 +55,17 @@ public class MessageRepository {
     }
 
     public LiveData<List<Message>> fetchMessages(Context context) {
+
         MutableLiveData<List<Message>> messages = new MutableLiveData<>();
 
         if (!cursorFetched) {
             getMessages(context)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(msgList -> messages.setValue(msgList));
+                    .subscribe(msgList -> {
+                        messages.setValue(msgList);
+                        cursorFetched = true;
+                    });
         }
 
         return msgDao.getAllMessages();

@@ -21,7 +21,11 @@ import butterknife.ButterKnife;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
-    private List<Message> dataset = new ArrayList<>();
+    private List<Message> dataset;
+
+    public MessageAdapter() {
+        dataset = new ArrayList<>();
+    }
 
     @NonNull
     @Override

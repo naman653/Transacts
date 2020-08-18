@@ -2,7 +2,6 @@ package com.payo.assignment.viewmodels;
 
 import android.content.Context;
 
-import androidx.core.graphics.drawable.IconCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -14,10 +13,12 @@ import java.util.List;
 
 public class MessagesViewModel extends ViewModel {
 
-    private MutableLiveData<List<Message>> messages = new MutableLiveData<>();
-
     public LiveData<List<Message>> getMessages(Context context) {
         return MessageRepository.getInstance(context).fetchMessages(context);
+    }
+
+    public LiveData<List<Message>> filterMessages(Context context, String type) {
+        return MessageRepository.getInstance(context).fetchTypeMessages(type);
     }
 
     public MutableLiveData<Double> getAmountCredited(Context context) {
